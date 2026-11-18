@@ -1,20 +1,115 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Scissors } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
+import { Loader2, Scissors } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "react-toastify"
 
 export default function SignUpPage() {
-  const [fullName, setFullName] = useState("")
+  const router = useRouter()
+  const [name, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [profileImage, setProfileImage] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log({ fullName, email, password, profileImage })
+    // Password Validation Check
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.")
+      return
+    }
+    if (!/[A-Z]/.test(password)) {
+      toast.error("Password must contain at least one Uppercase letter.")
+      return
+    }
+    if (!/[a-z]/.test(password)) {
+      toast.error("Password must contain at least one Lowercase letter.")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      let imageUrl = ""
+
+      // যদি ইউজার ছবি সিলেক্ট করে থাকে তবেই ImgBB তে আপলোড হবে
+      if (profileImage) {
+        const imgData = new FormData()
+        imgData.append("image", profileImage)
+
+        const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_KEY
+
+        if (!imgbbApiKey) {
+          toast.error("ImgBB API Key is missing in environment variables.")
+          setLoading(false)
+          return
+        }
+
+        const imgRes = await fetch(
+          `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
+          {
+            method: "POST",
+            body: imgData,
+          }
+        )
+
+        const imgResult = await imgRes.json()
+        if (imgResult.success) {
+          imageUrl = imgResult.data.url
+        } else {
+          toast.error("Image upload to ImgBB failed.")
+          setLoading(false)
+          return
+        }
+      }
+
+      // Better Auth দিয়ে সাইন আপ রিকোয়েস্ট পাঠানো
+      const result = await authClient.signUp.email({
+        email,
+        password,
+        name,
+        image: imageUrl || undefined,
+        callbackURL: "/",
+      })
+
+      const { data, error } = result
+
+      if (error) {
+        toast.error(
+          error.message ?? "Something went wrong during registration."
+        )
+        setLoading(false)
+        return
+      }
+
+      if (data) {
+        toast.success("User Registration Successful!")
+        router.push("/")
+        router.refresh()
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message)
+      } else {
+        toast.error("An unexpected error occurred.")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Google Sign-In Handler
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    })
   }
 
   return (
@@ -43,7 +138,7 @@ export default function SignUpPage() {
             <input
               type="text"
               required
-              value={fullName}
+              value={name}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your Name"
               className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-white placeholder-zinc-600 focus:border-[#a63d61] focus:outline-none"
@@ -78,7 +173,6 @@ export default function SignUpPage() {
               placeholder="••••••••"
               className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-white placeholder-zinc-600 focus:border-[#a63d61] focus:outline-none"
             />
-            {/* Requirement: Password rules */}
             <p className="mt-1 text-[11px] text-zinc-400">
               Min 6 characters, one uppercase, one lowercase.
             </p>
@@ -87,7 +181,7 @@ export default function SignUpPage() {
           {/* Profile Image Upload */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-zinc-300">
-              Profile image (upload or URL)
+              Profile image (Optional)
             </label>
             <input
               type="file"
@@ -100,9 +194,16 @@ export default function SignUpPage() {
           {/* Create Account Button */}
           <Button
             type="submit"
-            className="mt-2 h-10 w-full rounded-lg bg-[#a63d61] font-medium text-white shadow-md transition-all hover:bg-[#8e3252]"
+            disabled={loading}
+            className="mt-2 h-10 w-full rounded-lg bg-[#a63d61] font-medium text-white shadow-md transition-all hover:bg-[#8e3252] disabled:opacity-50"
           >
-            Create Account
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Creating account...
+              </span>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </form>
 
@@ -111,7 +212,7 @@ export default function SignUpPage() {
           <p className="text-xs text-zinc-400">
             Have an account?{" "}
             <Link
-              href="/sign-in"
+              href="/signin"
               className="font-medium text-[#e06c91] hover:underline"
             >
               Sign In
@@ -132,6 +233,7 @@ export default function SignUpPage() {
         {/* Google Login Button */}
         <Button
           type="button"
+          onClick={handleGoogleSignIn}
           variant="outline"
           className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border-zinc-700 bg-zinc-950 text-sm font-medium text-zinc-200 hover:bg-zinc-800 hover:text-white"
         >

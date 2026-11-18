@@ -1,18 +1,58 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Scissors } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
+import { Loader2, Scissors } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "react-toastify"
 
 export default function SignInPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // এখানে Better Auth বা আপনার ব্যাকএন্ড সাইন-ইন লজিক যুক্ত করবেন
-    console.log({ email, password })
+    setLoading(true)
+
+    try {
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+      })
+
+      if (error) {
+        toast.error(error.message ?? "Invalid email or password.")
+        setLoading(false)
+        return
+      }
+
+      if (data) {
+        toast.success("Sign In Successful!")
+        router.push("/")
+        router.refresh()
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message)
+      } else {
+        toast.error("An unexpected error occurred.")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Google Sign-In Handler
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    })
   }
 
   return (
@@ -66,9 +106,16 @@ export default function SignInPage() {
           {/* Sign In Button */}
           <Button
             type="submit"
-            className="mt-2 h-10 w-full rounded-lg bg-[#a63d61] font-medium text-white shadow-md transition-all hover:bg-[#8e3252]"
+            disabled={loading}
+            className="mt-2 h-10 w-full rounded-lg bg-[#a63d61] font-medium text-white shadow-md transition-all hover:bg-[#8e3252] disabled:opacity-50"
           >
-            Sign In
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Signing in...
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
 
@@ -98,6 +145,7 @@ export default function SignInPage() {
         {/* Google Login Button */}
         <Button
           type="button"
+          onClick={handleGoogleSignIn}
           variant="outline"
           className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border-zinc-700 bg-zinc-950 text-sm font-medium text-zinc-200 hover:bg-zinc-800 hover:text-white"
         >

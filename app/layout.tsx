@@ -1,8 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
 import Navbar from "@/components/shared/Navbar/Navbar"
-import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+import { ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
@@ -29,10 +30,9 @@ export default function RootLayout({
       )}
     >
       <body suppressHydrationWarning={true}>
-        <ThemeProvider>
-          <Navbar />
-          {children}
-        </ThemeProvider>
+        <Navbar />
+        {children}
+        <ToastContainer />
       </body>
     </html>
   )
