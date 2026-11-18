@@ -22,8 +22,7 @@ export default function Navbar() {
     })
   }
 
-  const dashboardHref =
-    user?.role === "admin" ? "/dashboard/admin" : "/dashboard/customer"
+  const dashboardHref = user?.role === "admin" ? "/admin" : "/customer"
 
   const navLinks = [
     { name: "Home", href: "/" },
