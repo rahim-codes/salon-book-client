@@ -9,6 +9,13 @@ export const apiClient = {
       return result
     },
 
+    getFeatured: async () => {
+      const res = await fetch(`${API_BASE_URL}/services/featured`, {
+        cache: "no-store",
+      })
+      return await res.json()
+    },
+
     // new service add (Admin)
     create: async (serviceData: {
       name: string
