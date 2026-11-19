@@ -27,7 +27,7 @@ export default function DashboardLayout({
     { name: "Overview", href: "/admin", icon: LayoutDashboard },
     {
       name: "Manage Services",
-      href: "/dashboard/admin/services",
+      href: "/admin/manage-services",
       icon: ConciergeBell,
     },
     {

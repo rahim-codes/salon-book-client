@@ -63,7 +63,7 @@ export default function ServiceCard({ service }: ServiceCardProps) {
 
           {/* View Details Button */}
           <Link
-            href={`/services/${_id}`}
+            href={`/service-details/${_id}`}
             className="flex h-10 w-full items-center justify-center rounded-lg bg-[#a63d61] font-medium text-white shadow-sm transition-all hover:bg-[#8e3252]"
           >
             View Details
