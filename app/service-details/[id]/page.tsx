@@ -1,11 +1,6 @@
+import BookingSection from "@/components/Appointments/BookingSection"
 import { apiClient } from "@/lib/api-client"
-import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  CheckCircle2,
-  Clock,
-} from "lucide-react"
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -149,20 +144,7 @@ export default async function ServiceDetailsPage({
 
             {/* Appointment Booking Option */}
             <div className="border-t border-zinc-800 pt-4">
-              {isActive ? (
-                <Link
-                  href={`/book/${service._id}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#a63d61] font-medium text-white shadow-lg shadow-rose-950/20 transition-all hover:bg-[#8e3252]"
-                >
-                  <Calendar className="h-4 w-4" />
-                  <span>Book Appointment Now</span>
-                </Link>
-              ) : (
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-center text-sm text-zinc-400">
-                  This service is currently inactive and not available for
-                  booking.
-                </div>
-              )}
+              <BookingSection service={service} />
             </div>
           </div>
         </div>

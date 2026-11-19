@@ -11,6 +11,20 @@ export interface ServicePayload {
   status: "Active" | "Inactive"
 }
 
+export interface AppointmentPayload {
+  serviceId: string
+  serviceName: string
+  serviceImage?: string
+  serviceCategory?: string
+  price: number
+  duration: number
+  appointmentDate: string
+  timeSlot: string
+  message?: string
+  customerName?: string
+  customerEmail: string
+}
+
 export const apiClient = {
   // ==================== Service Actions ====================
   uploadImage: async (file: File): Promise<string> => {
@@ -101,16 +115,42 @@ export const apiClient = {
     },
   },
 
-  // ==================== Appointment Actions ====================
-  //   appointments: {
-  //
-  //     create: async (appointmentData: any) => {
-  //       const res = await fetch(`${API_BASE_URL}/appointments`, {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(appointmentData),
-  //       });
-  //       return await res.json();
-  //     },
-  //   },
+  appointments: {
+    create: async (appointmentData: AppointmentPayload) => {
+      const res = await fetch(`${API_BASE_URL}/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(appointmentData),
+      })
+      return await res.json()
+    },
+
+    getByCustomer: async (email: string) => {
+      const res = await fetch(
+        `${API_BASE_URL}/appointments?email=${encodeURIComponent(email)}`,
+        { cache: "no-store" }
+      )
+      return await res.json()
+    },
+
+    cancel: async (id: string, customerEmail: string) => {
+      const res = await fetch(`${API_BASE_URL}/appointments/${id}/cancel`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerEmail }),
+      })
+      return await res.json()
+    },
+
+    pay: async (id: string, customerEmail: string) => {
+      const res = await fetch(`${API_BASE_URL}/appointments/${id}/pay`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerEmail }),
+      })
+      return await res.json()
+    },
+  },
 }

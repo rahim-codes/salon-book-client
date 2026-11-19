@@ -54,7 +54,7 @@ export default function DashboardLayout({
     { name: "Overview", href: "/dashboard/customer", icon: LayoutDashboard },
     {
       name: "My Appointments",
-      href: "/dashboard/customer/appointments",
+      href: "/customer/my-appointments",
       icon: CalendarCheck,
     },
     { name: "My Profile", href: "/dashboard/customer/profile", icon: User },
