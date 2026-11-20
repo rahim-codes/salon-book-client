@@ -214,4 +214,22 @@ export const apiClient = {
       return await res.json()
     },
   },
+
+  users: {
+    getAllCustomers: async () => {
+      const res = await fetch(`${API_BASE_URL}/users`, {
+        cache: "no-store",
+      })
+      return await res.json()
+    },
+
+    updateBlockStatus: async (id: string, blocked: boolean) => {
+      const res = await fetch(`${API_BASE_URL}/users/${id}/block-status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blocked }),
+      })
+      return await res.json()
+    },
+  },
 }

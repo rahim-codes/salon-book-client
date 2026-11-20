@@ -1,6 +1,8 @@
 "use client"
 
+import { apiClient } from "@/lib/api-client"
 import {
+  Ban,
   CalendarCheck,
   ConciergeBell,
   CreditCard,
@@ -23,26 +25,36 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [role, setRole] = useState<string | null>(null)
+  const [isBlocked, setIsBlocked] = useState(false)
 
   useEffect(() => {
     let active = true
 
-    async function fetchRole() {
+    async function fetchSessionAndStatus() {
       try {
         const res = await fetch("/api/auth/get-session", { cache: "no-store" })
         if (!res.ok) return
         const session = await res.json()
-        const userRole =
-          session?.user?.role || session?.data?.user?.role || null
+        const user = session?.user || session?.data?.user
+        const userRole = user?.role || null
+        const email = user?.email?.trim().toLowerCase()
+
         if (active && userRole) {
           setRole(String(userRole).toLowerCase())
         }
+
+        if (email) {
+          const profileRes = await apiClient.profile.get(email)
+          if (active) {
+            setIsBlocked(Boolean(profileRes?.data?.blocked))
+          }
+        }
       } catch {
-        // সেশন না পাওয়া গেলে পাথওয়ে ফলব্যাক ব্যবহার হবে
+        // সেশন বা প্রোফাইল চেক ব্যর্থ হলে ফলব্যাক ব্যবহার হবে
       }
     }
 
-    fetchRole()
+    fetchSessionAndStatus()
     return () => {
       active = false
     }
@@ -68,10 +80,10 @@ export default function DashboardLayout({
       href: "/admin/manage-appointments",
       icon: CalendarCheck,
     },
-    { name: "Manage Users", href: "/dashboard/admin/users", icon: Users },
+    { name: "Manage Users", href: "/admin/users", icon: Users },
     {
       name: "Transactions",
-      href: "/dashboard/admin/transactions",
+      href: "/admin/transactions",
       icon: CreditCard,
     },
     { name: "My Profile", href: "/profile", icon: User },
@@ -94,12 +106,37 @@ export default function DashboardLayout({
     try {
       await fetch("/api/auth/sign-out", { method: "POST" })
     } catch {
-      // ইগনোর করা হয়েছে
+      // ইগনোর করা হয়েছে
     } finally {
       setRole(null)
+      setIsBlocked(false)
       router.push("/login")
       router.refresh()
     }
+  }
+
+  if (isBlocked) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4 text-center text-zinc-100">
+        <div className="w-full max-w-md rounded-2xl border border-rose-900/50 bg-zinc-900 p-8 shadow-xl">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-rose-800/60 bg-rose-950/60 text-rose-400">
+            <Ban className="h-7 w-7" />
+          </div>
+          <h2 className="text-xl font-bold text-white">Account Restricted</h2>
+          <p className="mt-2 text-sm text-zinc-400">
+            Your account has been blocked by the administrator. You cannot
+            access dashboard features or appointments right now.
+          </p>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-[#a63d61] px-5 text-xs font-semibold text-white transition-colors hover:bg-[#8e3252]"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
