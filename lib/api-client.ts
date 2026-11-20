@@ -152,5 +152,31 @@ export const apiClient = {
       })
       return await res.json()
     },
+
+    getAll: async () => {
+      const res = await fetch(`${API_BASE_URL}/appointments`, {
+        cache: "no-store",
+      })
+      return await res.json()
+    },
+
+    confirm: async (id: string) => {
+      const res = await fetch(`${API_BASE_URL}/appointments/${id}/confirm`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      })
+      return await res.json()
+    },
+
+    adminCancel: async (id: string) => {
+      const res = await fetch(
+        `${API_BASE_URL}/appointments/${id}/admin-cancel`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      return await res.json()
+    },
   },
 }

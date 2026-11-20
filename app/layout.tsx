@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
+import Footer from "@/components/shared/Footer"
 import Navbar from "@/components/shared/Navbar/Navbar"
 import { cn } from "@/lib/utils"
 import { ToastContainer } from "react-toastify"
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}>
         <Navbar />
         {children}
+        <Footer />
         <ToastContainer />
       </body>
     </html>

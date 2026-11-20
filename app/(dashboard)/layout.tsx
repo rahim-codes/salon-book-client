@@ -37,7 +37,7 @@ export default function DashboardLayout({
     },
     {
       name: "Manage Appointments",
-      href: "/dashboard/admin/appointments",
+      href: "/admin/manage-appointments",
       icon: CalendarCheck,
     },
     { name: "Manage Users", href: "/dashboard/admin/users", icon: Users },
