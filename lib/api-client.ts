@@ -25,6 +25,14 @@ export interface AppointmentPayload {
   customerEmail: string
 }
 
+export interface ProfileUpdatePayload {
+  name: string
+  image: string
+  phone: string
+  actorEmail: string
+  targetEmail?: string
+}
+
 export const apiClient = {
   // ==================== Service Actions ====================
   uploadImage: async (file: File): Promise<string> => {
@@ -176,6 +184,33 @@ export const apiClient = {
           headers: { "Content-Type": "application/json" },
         }
       )
+      return await res.json()
+    },
+  },
+
+  profile: {
+    get: async (email: string) => {
+      const res = await fetch(
+        `${API_BASE_URL}/profile?email=${encodeURIComponent(email)}`,
+        {
+          cache: "no-store",
+          headers: {
+            "x-user-email": email,
+          },
+        }
+      )
+      return await res.json()
+    },
+
+    update: async (payload: ProfileUpdatePayload) => {
+      const res = await fetch(`${API_BASE_URL}/profile`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-email": payload.actorEmail,
+        },
+        body: JSON.stringify(payload),
+      })
       return await res.json()
     },
   },

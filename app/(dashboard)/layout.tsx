@@ -12,7 +12,8 @@ import {
   Users,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function DashboardLayout({
   children,
@@ -20,7 +21,34 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const isAdmin = pathname.startsWith("/admin")
+  const router = useRouter()
+  const [role, setRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    async function fetchRole() {
+      try {
+        const res = await fetch("/api/auth/get-session", { cache: "no-store" })
+        if (!res.ok) return
+        const session = await res.json()
+        const userRole =
+          session?.user?.role || session?.data?.user?.role || null
+        if (active && userRole) {
+          setRole(String(userRole).toLowerCase())
+        }
+      } catch {
+        // সেশন না পাওয়া গেলে পাথওয়ে ফলব্যাক ব্যবহার হবে
+      }
+    }
+
+    fetchRole()
+    return () => {
+      active = false
+    }
+  }, [pathname])
+
+  const isAdmin = role ? role === "admin" : pathname.startsWith("/admin")
 
   // Admin sidebar
   const adminLinks = [
@@ -46,25 +74,37 @@ export default function DashboardLayout({
       href: "/dashboard/admin/transactions",
       icon: CreditCard,
     },
-    { name: "My Profile", href: "/dashboard/admin/profile", icon: User },
+    { name: "My Profile", href: "/profile", icon: User },
   ]
 
   // Customer sidebar
   const customerLinks = [
-    { name: "Overview", href: "/dashboard/customer", icon: LayoutDashboard },
+    { name: "Overview", href: "/customer", icon: LayoutDashboard },
     {
       name: "My Appointments",
       href: "/customer/my-appointments",
       icon: CalendarCheck,
     },
-    { name: "My Profile", href: "/dashboard/customer/profile", icon: User },
+    { name: "My Profile", href: "/profile", icon: User },
   ]
 
   const links = isAdmin ? adminLinks : customerLinks
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/sign-out", { method: "POST" })
+    } catch {
+      // ইগনোর করা হয়েছে
+    } finally {
+      setRole(null)
+      router.push("/login")
+      router.refresh()
+    }
+  }
+
   return (
     <div className="flex min-h-screen bg-zinc-50 text-zinc-900">
-      {/* Sidebar (Dark Theme as per Screenshot) */}
+      {/* Sidebar */}
       <aside className="flex w-64 shrink-0 flex-col justify-between border-r border-zinc-800 bg-[#23171f] text-zinc-100">
         <div>
           {/* Logo Area */}
@@ -104,7 +144,8 @@ export default function DashboardLayout({
         {/* Bottom Logout Button */}
         <div className="border-t border-zinc-800/80 p-4">
           <button
-            onClick={() => console.log("Logging out...")}
+            type="button"
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-950/40 hover:text-rose-200"
           >
             <LogOut className="h-4 w-4" />
