@@ -148,49 +148,77 @@ export default function MyAppointmentsPage() {
     }
   }
 
+  // const handlePay = async (id: string) => {
+  //   updateUi({ actionId: id, feedback: null })
+  //   try {
+  //     const res = await apiClient.appointments.pay(id, userEmail)
+  //     if (res.success) {
+  //       setAppointments((prev) =>
+  //         prev.map((item) =>
+  //           item._id === id ? { ...item, paymentStatus: "Paid" } : item
+  //         )
+  //       )
+  //       if (ui.selected?._id === id) {
+  //         updateUi({
+  //           selected: { ...ui.selected, paymentStatus: "Paid" },
+  //           feedback: {
+  //             type: "success",
+  //             message: res.message || "Payment completed!",
+  //           },
+  //         })
+  //       } else {
+  //         updateUi({
+  //           feedback: {
+  //             type: "success",
+  //             message: res.message || "Payment completed!",
+  //           },
+  //         })
+  //       }
+  //     } else {
+  //       updateUi({
+  //         feedback: {
+  //           type: "error",
+  //           message: res.message || "Payment could not be processed.",
+  //         },
+  //       })
+  //     }
+  //   } catch {
+  //     updateUi({
+  //       feedback: {
+  //         type: "error",
+  //         message: "Failed to process payment.",
+  //       },
+  //     })
+  //   } finally {
+  //     updateUi({ actionId: null })
+  //   }
+  // }
+
   const handlePay = async (id: string) => {
     updateUi({ actionId: id, feedback: null })
     try {
-      const res = await apiClient.appointments.pay(id, userEmail)
-      if (res.success) {
-        setAppointments((prev) =>
-          prev.map((item) =>
-            item._id === id ? { ...item, paymentStatus: "Paid" } : item
-          )
-        )
-        if (ui.selected?._id === id) {
-          updateUi({
-            selected: { ...ui.selected, paymentStatus: "Paid" },
-            feedback: {
-              type: "success",
-              message: res.message || "Payment completed!",
-            },
-          })
-        } else {
-          updateUi({
-            feedback: {
-              type: "success",
-              message: res.message || "Payment completed!",
-            },
-          })
-        }
-      } else {
-        updateUi({
-          feedback: {
-            type: "error",
-            message: res.message || "Payment could not be processed.",
-          },
-        })
+      const res = await apiClient.payments.createCheckoutSession(id, userEmail)
+
+      if (res.success && res.url) {
+        window.location.href = res.url
+        return
       }
+
+      updateUi({
+        feedback: {
+          type: "error",
+          message: res.message || "Could not start Stripe checkout.",
+        },
+        actionId: null,
+      })
     } catch {
       updateUi({
         feedback: {
           type: "error",
-          message: "Failed to process payment.",
+          message: "Failed to initiate payment. Please try again.",
         },
+        actionId: null,
       })
-    } finally {
-      updateUi({ actionId: null })
     }
   }
 

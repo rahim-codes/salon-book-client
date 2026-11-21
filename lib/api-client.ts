@@ -232,4 +232,30 @@ export const apiClient = {
       return await res.json()
     },
   },
+  payments: {
+    createCheckoutSession: async (
+      appointmentId: string,
+      customerEmail: string
+    ) => {
+      const res = await fetch(
+        `${API_BASE_URL}/payments/create-checkout-session`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ appointmentId, customerEmail }),
+        }
+      )
+      return await res.json()
+    },
+
+    verifySession: async (sessionId: string) => {
+      const res = await fetch(
+        `${API_BASE_URL}/payments/verify-session?session_id=${encodeURIComponent(
+          sessionId
+        )}`,
+        { cache: "no-store" }
+      )
+      return await res.json()
+    },
+  },
 }
