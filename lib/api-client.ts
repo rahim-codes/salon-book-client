@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.SERVER_BASE_URL || "http://localhost:5000"
+const API_BASE_URL = process.env.SERVER_BASE_URL
 const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY
 
 export interface ServicePayload {
@@ -67,7 +67,7 @@ export const apiClient = {
 
     getFeatured: async () => {
       const res = await fetch(`${API_BASE_URL}/services/featured`, {
-        cache: "no-store",
+        next: { revalidate: 60 },
       })
       return await res.json()
     },
