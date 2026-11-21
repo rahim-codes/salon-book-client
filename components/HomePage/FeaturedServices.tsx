@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
-import ServiceCard from "@/components/shared/ServiceCard"
+import ServiceCard, { type Service } from "@/components/shared/ServiceCard"
 import { apiClient } from "@/lib/api-client"
 
 export default async function FeaturedServices() {
