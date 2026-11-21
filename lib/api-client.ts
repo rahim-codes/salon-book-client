@@ -257,5 +257,11 @@ export const apiClient = {
       )
       return await res.json()
     },
+    getAll: async () => {
+      const res = await fetch(`${API_BASE_URL}/transactions`, {
+        cache: "no-store",
+      })
+      return await res.json()
+    },
   },
 }
