@@ -124,7 +124,7 @@ export default function SignInPage() {
           <p className="text-xs text-zinc-400">
             Don&apos;t have an account?{" "}
             <Link
-              href="/sign-up"
+              href="/signup"
               className="font-medium text-[#e06c91] hover:underline"
             >
               Sign Up
