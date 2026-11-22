@@ -44,8 +44,7 @@ interface UserInfoProps {
 export function UserInfo({ user, isPending, onLogout }: UserInfoProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const dashboardHref =
-    user?.role === "admin" ? "/dashboard/admin" : "/dashboard/customer"
+  const dashboardHref = user?.role === "admin" ? "/admin" : "/customer"
 
   const avatarSrc = user?.profileImage || user?.image || undefined
 
@@ -88,7 +87,6 @@ export function UserInfo({ user, isPending, onLogout }: UserInfoProps) {
               align="end"
               className="w-56 border-zinc-800 bg-zinc-900 text-zinc-200"
             >
-              {/* Base UI তে DropdownMenuLabel অবশ্যই DropdownMenuGroup এর ভেতর থাকতে হবে */}
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
@@ -116,7 +114,7 @@ export function UserInfo({ user, isPending, onLogout }: UserInfoProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer focus:bg-zinc-800 focus:text-white">
                   <Link
-                    href={`${dashboardHref}/profile`}
+                    href="/profile"
                     className="flex w-full items-center gap-2"
                   >
                     <UserIcon className="h-4 w-4 text-zinc-400" />

@@ -8,7 +8,6 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 scale-100 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
         style={{
-          // আপনার নিজের ইমেজ পাথ এখানে বসাবেন (যেমন: /images/hero-bg.jpg বা পাবলিক ফোল্ডারের যেকোনো ছবি)
           backgroundImage: "url('/images/salon-hero-bg.jpg')",
         }}
       >
@@ -39,7 +38,7 @@ export default function HeroSection() {
         {/* CTA Buttons */}
         <div className="flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:items-center">
           <Link
-            href="/services"
+            href="/browser-services"
             className="group flex h-12 items-center justify-center gap-2 rounded-xl bg-[#a63d61] px-8 font-semibold text-white shadow-lg shadow-rose-950/50 transition-all duration-200 hover:bg-[#8e3252]"
           >
             <span>Explore Salon Services</span>
@@ -47,7 +46,7 @@ export default function HeroSection() {
           </Link>
 
           <Link
-            href="/sign-in"
+            href="/signin"
             className="flex h-12 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900/50 px-8 text-zinc-200 backdrop-blur-md hover:bg-zinc-800 hover:text-white"
           >
             Sign In to Account

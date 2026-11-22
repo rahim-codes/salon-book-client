@@ -1,5 +1,5 @@
-const rawBaseUrl = process.env.NEXT_PUBLIC_SERVER_BASE_URL || ""
-const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "")
+const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_BASE_URL || ""
+
 const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY
 
 export interface ServicePayload {

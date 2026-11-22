@@ -30,7 +30,7 @@ export default async function FeaturedServices() {
             </h2>
           </div>
           <Link
-            href="/services"
+            href="/browser-services"
             className="group flex items-center gap-2 text-sm font-medium text-[#e06c91] transition-colors hover:text-white"
           >
             <span>View All Services</span>
